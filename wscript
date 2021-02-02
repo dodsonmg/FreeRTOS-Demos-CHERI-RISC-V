@@ -1180,6 +1180,42 @@ def options(ctx):
                    default=False,
                    help='Log output over UDP and not stdout/serial')
 
+    # Modbus options
+    ctx.add_option('--modbus_microbenchmark',
+                   action='store_true',
+                   default=False,
+                   help='Compile FreeRTOS Modbus server for microbenchmarking and set execution period (default = 0)')
+
+    ctx.add_option('--modbus_macrobenchmark',
+                   action='store_true',
+                   default=False,
+                   help='Compile FreeRTOS Modbus server for macrobenchmarking and set simulated network delay (default = 0)')
+
+    ctx.add_option('--modbus_exec_period',
+                   action='store',
+                   default=0,
+                   help='The execution period for the Modbus server in milliseconds (default = 0)')
+
+    ctx.add_option('--modbus_network_delay',
+                   action='store',
+                   default=0,
+                   help='The simulated network delay for the Modbus server in milliseconds (default = 0)')
+
+    ctx.add_option('--modbus_object_caps',
+                   action='store_true',
+                   default=False,
+                   help='Compile FreeRTOS Modbus server to use local object capabilities')
+
+    ctx.add_option('--modbus_object_caps_stubs',
+                   action='store_true',
+                   default=False,
+                   help='Compile FreeRTOS Modbus server to call into, but not use, the local object capabilities layer.  Used to measure cost of the object capabilities shim layer.')
+
+    ctx.add_option('--modbus_network_caps',
+                   action='store_true',
+                   default=False,
+                   help='Compile FreeRTOS Modbus server to use network capabilities')
+
     # Run options
     ctx.add_option('--run',
                    action='store_true',
@@ -1232,11 +1268,21 @@ def configure(ctx):
     ctx.env.COMPARTMENTALIZE = ctx.options.compartmentalize
     ctx.env.COMP_MODE = ctx.options.compartmentalization_mode
     ctx.env.DEBUG = ctx.options.debug
+<<<<<<< HEAD
     ctx.env.IP_ADDR = ctx.options.ipaddr
     ctx.env.GATEWAY_ADDR = ctx.options.gateway
     ctx.env.LOG_UDP = ctx.options.log_udp
 
     ipaddr_freertos_ipconfig(ctx.env.IP_ADDR, ctx.env.GATEWAY_ADDR, ctx)
+=======
+    ctx.env.MODBUS_MICROBENCHMARK = ctx.options.modbus_microbenchmark
+    ctx.env.MODBUS_MACROBENCHMARK = ctx.options.modbus_macrobenchmark
+    ctx.env.MODBUS_EXEC_PERIOD = ctx.options.modbus_exec_period
+    ctx.env.MODBUS_NETWORK_DELAY = ctx.options.modbus_network_delay
+    ctx.env.MODBUS_OBJECT_CAPS = ctx.options.modbus_object_caps
+    ctx.env.MODBUS_OBJECT_CAPS_STUBS = ctx.options.modbus_object_caps_stubs
+    ctx.env.MODBUS_NETWORK_CAPS = ctx.options.modbus_network_caps
+>>>>>>> dd2b42b... servers: Integrate modbus server files
 
     # Libs - Minimal libs required for any FreeRTOS Demo
     ctx.env.append_value('LIB', ['c'])
@@ -1377,11 +1423,25 @@ def configure(ctx):
         ctx.env.append_value('CFLAGS', ['-g', '-O0'])
         ctx.define('configPORT_ALLOW_APP_EXCEPTION_HANDLERS', 1)
         ctx.define('DEBUG', 1)
+<<<<<<< HEAD
         ctx.define('ipconfigHAS_DEBUG_PRINTF', 1)
+=======
+    elif ctx.env.MODBUS_MICROBENCHMARK or ctx.env.MODBUS_MACROBENCHMARK:
+        ctx.env.append_value('CFLAGS', ['-Os'])
+        ctx.define('NDEBUG', 1)
+>>>>>>> dd2b42b... servers: Integrate modbus server files
     else:
         ctx.env.append_value('CFLAGS', ['-Os'])
         ctx.define('NDEBUG', 1)
 
+<<<<<<< HEAD
+=======
+
+    # PROG - For legacy compatibility
+    if not any('configPROG_ENTRY' in define for define in ctx.env.DEFINES):
+        ctx.env.append_value('DEFINES', ['configPROG_ENTRY=' + ctx.env.PROG])
+
+>>>>>>> dd2b42b... servers: Integrate modbus server files
     freertos_bsp_configure(ctx)
     freertos_libs_configure(ctx)
 
