@@ -1632,6 +1632,7 @@ def build(bld):
         features="c",
         includes=['.'],
         libpath=['.', bld.env.PROGRAM_PATH],
+        use= [bld.env.PROG],
         ldflags=bld.env.CFLAGS +
             ['-T',
             bld.path.abspath() + '/link.ld', '-nostartfiles', '-nostdlib',
