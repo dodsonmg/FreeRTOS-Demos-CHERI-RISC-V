@@ -29,7 +29,10 @@
 #define _MODBUS_OBJECT_CAPABILITIES_H_
 
 #include <stdio.h>
+<<<<<<< HEAD
 #include <FreeRTOSConfig.h>
+=======
+>>>>>>> 9afaa9c... servers: Integrate modbus server files
 
 /* For CHERI */
 #ifdef __CHERI_PURE_CAPABILITY__

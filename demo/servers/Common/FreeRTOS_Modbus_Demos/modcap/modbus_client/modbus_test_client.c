@@ -11,7 +11,10 @@
 #include <errno.h>
 #include <sys/time.h>
 
+<<<<<<< HEAD
 #include "FreeRTOSConfig.h"
+=======
+>>>>>>> 9afaa9c... servers: Integrate modbus server files
 #include "modbus/modbus.h"
 
 #include "modbus_test_constants.h"

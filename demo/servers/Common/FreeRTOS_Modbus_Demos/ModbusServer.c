@@ -73,7 +73,10 @@ mission critical applications that require provable dependability.
 #include <stdarg.h>
 
 /* FreeRTOS includes. */
+<<<<<<< HEAD
 #include "FreeRTOSConfig.h"
+=======
+>>>>>>> 9afaa9c... servers: Integrate modbus server files
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
