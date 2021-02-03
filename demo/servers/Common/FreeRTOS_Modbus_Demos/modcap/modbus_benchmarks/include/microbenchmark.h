@@ -39,11 +39,13 @@
  * SPARE_PREOCESSING: @ server. Measures spare time after processing a request.
  * REQUEST_PROCESSING: @ server. Measures time to process a request.
  * MAX_PROCESSING: @ client. Measures time for request/reply roundtrips.
+ * WHOLE_SESSION: @ server. Measures time from first request to last reply.
  */
 typedef enum _BenchmarkType_t {
     SPARE_PROCESSING,
     REQUEST_PROCESSING,
-    MAX_PROCESSING
+    MAX_PROCESSING,
+    WHOLE_SESSION
 } BenchmarkType_t;
 
 /*-----------------------------------------------------------*/

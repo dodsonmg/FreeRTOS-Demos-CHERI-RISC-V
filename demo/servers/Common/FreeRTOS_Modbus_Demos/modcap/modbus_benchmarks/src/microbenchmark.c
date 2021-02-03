@@ -153,6 +153,7 @@ void vPrintMicrobenchmarkSamples( void )
     char *spare_string = "SPARE_PROCESSING_MICROBENCHMARK";
     char *request_string = "REQUEST_PROCESSING_MICROBENCHMARK";
     char *max_string = "MAX_PROCESSING_MACROBENCHMARK";
+    char *session_string = "WHOLE_SESSION_MACROBENCHMARK";
     char *print_string;
 
     /* Print out column headings for the run-time stats table. */
@@ -167,9 +168,17 @@ void vPrintMicrobenchmarkSamples( void )
         {
             print_string = request_string;
         }
-        else
+        else if( pxPrintBuffer[ i ].xBenchmark == MAX_PROCESSING )
         {
             print_string = max_string;
+        }
+        else if( pxPrintBuffer[ i ].xBenchmark == WHOLE_SESSION )
+        {
+            print_string = session_string;
+        }
+        else
+        {
+            print_string = "BAD VALUE";
         }
 
         printf( "%s, %s, %u\n",

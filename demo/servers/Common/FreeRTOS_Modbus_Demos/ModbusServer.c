@@ -94,7 +94,7 @@ mission critical applications that require provable dependability.
 #include <modbus/modbus-helpers.h>
 
 /* Microbenchmark includes */
-#if defined( MODBUS_MICROBENCHMARK )
+#if defined( MODBUS_MICROBENCHMARK ) || defined( MODBUS_MACROBENCHMARK )
 #include "microbenchmark.h"
 #endif
 
@@ -165,7 +165,10 @@ void prvModbusServerTask( void *pvParameters )
     BaseType_t xReturned;
     char *pcModbusFunctionName;
     Socket_t xListeningSocket, xConnectedSocket;
-    uint64_t ulCycleCountStart, ulCycleCountEnd, ulCycleCountDiff;
+
+    uint64_t ulInnerCycleCountStart, ulInnerCycleCountEnd;
+    uint64_t ulOuterCycleCountStart, ulOuterCycleCountEnd;
+    uint64_t ulCycleCountDiff;
 
     /* The strange casting is to remove compiler warnings on 32-bit machines. */
     uint16_t usPort = ( uint16_t ) ( ( uint32_t ) pvParameters ) & 0xffffUL;
@@ -205,6 +208,10 @@ void prvModbusServerTask( void *pvParameters )
         /* Receive a request from the Modbus client. */
         req_length = modbus_receive( ctx, req );
 
+        /* Start a counter right after receiving the first message.
+         * We'll diff this with a counter taken just before shutdown. */
+        ulOuterCycleCountStart = get_cycle_count();
+
 #if defined( modbusNETWORK_DELAY_MS )
         /* For the macrobenchmark, we simulate network delay by blocking
          * after receiving a request and before sending a reply. */
@@ -227,20 +234,20 @@ void prvModbusServerTask( void *pvParameters )
              * to modbus_process_request(). */
 
             /* get the cycle count before processing the request. */
-            ulCycleCountStart = get_cycle_count();
+            ulInnerCycleCountStart = get_cycle_count();
 
             /* Process the request. */
             xReturned  = prvProcessModbusRequest( req, req_length, rsp, &rsp_length );
             configASSERT( xReturned != -1 );
 
             /* get the cycle count after processing the request. */
-            ulCycleCountEnd = get_cycle_count();
+            ulInnerCycleCountEnd = get_cycle_count();
 
             /* critical access to mb_mapping and ctx is finished, so it's safe to exit */
             taskEXIT_CRITICAL();
 
             /* calculate the cycle count difference */
-            ulCycleCountDiff = ulCycleCountEnd - ulCycleCountStart;
+            ulCycleCountDiff = ulInnerCycleCountEnd - ulInnerCycleCountStart;
 
 #if defined( MODBUS_MICROBENCHMARK )
             /* Record the cycle count difference. */
@@ -287,16 +294,16 @@ void prvModbusServerTask( void *pvParameters )
                  * across a call to vTaskDelayUntil(). */
 
                 /* get the cycle count before blocking. */
-                ulCycleCountStart = get_cycle_count();
+                ulInnerCycleCountStart = get_cycle_count();
 
                 /* Block until the next, fixed execution period */
                 vTaskDelayUntil( &xPreviousWakeTime, xTimeIncrement );
 
                 /* get the cycle count after blocking. */
-                ulCycleCountEnd = get_cycle_count();
+                ulInnerCycleCountEnd = get_cycle_count();
 
                 /* calculate the cycle count difference */
-                ulCycleCountDiff = ulCycleCountEnd - ulCycleCountStart;
+                ulCycleCountDiff = ulInnerCycleCountEnd - ulInnerCycleCountStart;
             }
 
 #if defined( MODBUS_MICROBENCHMARK )
@@ -317,10 +324,22 @@ void prvModbusServerTask( void *pvParameters )
 #endif
         }
 
+        /* Take a count after the last message and before shutting down. */
+        ulOuterCycleCountEnd = get_cycle_count();
+
+        /* calculate the cycle count difference */
+        ulCycleCountDiff = ulOuterCycleCountEnd - ulOuterCycleCountStart;
+
+#if defined( MODBUS_MACROBENCHMARK )
+            /* Save the difference in cycle count as a benchmarking sample. */
+            xMicrobenchmarkSample( WHOLE_SESSION, "ALL",
+                    ulCycleCountDiff, pdTRUE );
+#endif /* defined( MODBUS_MICROBENCHMARK ) */
+
         /* Close the socket correctly. */
         prvGracefulShutdown();
 
-#if defined( MODBUS_MICROBENCHMARK )
+#if defined( MODBUS_MICROBENCHMARK ) || defined( MODBUS_MACROBENCHMARK )
         /* Print microbenchmark samples to stdout and do not reopen the port */
         vPrintMicrobenchmarkSamples();
 #endif
