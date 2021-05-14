@@ -1429,33 +1429,21 @@ def configure(ctx):
         ctx.env.append_value('CFLAGS', ['-g', '-O0'])
         ctx.define('configPORT_ALLOW_APP_EXCEPTION_HANDLERS', 1)
         ctx.define('DEBUG', 1)
-<<<<<<< HEAD
         ctx.define('ipconfigHAS_DEBUG_PRINTF', 1)
-<<<<<<< HEAD
-=======
     elif ctx.env.MODBUS_MICROBENCHMARK or ctx.env.MODBUS_MACROBENCHMARK:
         ctx.env.append_value('CFLAGS', ['-Os'])
         ctx.define('NDEBUG', 1)
->>>>>>> dd2b42b... servers: Integrate modbus server files
-=======
-
     elif ctx.env.MODBUS_MICROBENCHMARK or ctx.env.MODBUS_MACROBENCHMARK:
         ctx.env.append_value('CFLAGS', ['-Os'])
         ctx.define('NDEBUG', 1)
-
->>>>>>> 9afaa9c... servers: Integrate modbus server files
     else:
         ctx.env.append_value('CFLAGS', ['-Os'])
         ctx.define('NDEBUG', 1)
-
-<<<<<<< HEAD
-=======
 
     # PROG - For legacy compatibility
     if not any('configPROG_ENTRY' in define for define in ctx.env.DEFINES):
         ctx.env.append_value('DEFINES', ['configPROG_ENTRY=' + ctx.env.PROG])
 
->>>>>>> dd2b42b... servers: Integrate modbus server files
     freertos_bsp_configure(ctx)
     freertos_libs_configure(ctx)
 
@@ -1564,6 +1552,7 @@ def build(bld):
                                                        '/wscript'):
         # The program defines its own script
         try:
+            print(bld.env.PROGRAM_PATH)
             bld.recurse(bld.env.PROGRAM_PATH)
         except:
             bld.fatal('Bad provided program path and/or wscript')
